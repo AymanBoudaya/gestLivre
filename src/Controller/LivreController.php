@@ -17,34 +17,36 @@ final class LivreController extends AbstractController
     #[Route(name: 'app_livre_index', methods: ['GET'])]
     public function index(LivreRepository $livreRepository): Response
     {
-        $livres = $livreRepository ->findByPrixPagesAuteurTrie(50,250);
+        $livres = $livreRepository->findAll();
         return $this->render('livre/index.html.twig', [
             'livres' => $livres,
         ]);
     }
-    #[Route('/afficher/{isbn}',name: 'app_livre_afficher', methods: ['GET'])]
+    
+    #[Route('/afficher/{isbn}', name: 'app_livre_afficher', methods: ['GET'])]
     public function lelivre(LivreRepository $livreRepository, int $isbn = 0): Response
     {
-        if(!$isbn) return $this ->redirectToRoute('app_accueil');
+        if (!$isbn)
+            return $this->redirectToRoute('app_accueil');
         else
-        $unLivre = $livreRepository ->findOneBy(['isbn'=>$isbn]);
+            $unLivre = $livreRepository->findOneBy(['isbn' => $isbn]);
         return $this->render('livre/show.html.twig', [
             'livre' => $unLivre,
         ]);
     }
-    
+
     #[Route('/afficher/{isbn}/get-editeur', name: 'app_livre_editeur')]
-public function getEditeur(LivreRepository $livreRepository, int $isbn = 0): Response
-{
-    $livre = $livreRepository->findOneBy(['isbn' => $isbn]);
-    if (!$livre) {
-        throw $this->createNotFoundException('Livre non trouvé');
-    }
-    $editeur = $livre->getEditeur();
-    if (!$editeur) {
-        throw $this->createNotFoundException('Éditeur non trouvé pour ce livre');
-    }
-    return new Response("Nom de l'éditeur : " . $editeur->getNomEditeur());
+    public function getEditeur(LivreRepository $livreRepository, int $isbn = 0): Response
+    {
+        $livre = $livreRepository->findOneBy(['isbn' => $isbn]);
+        if (!$livre) {
+            throw $this->createNotFoundException('Livre non trouvé');
+        }
+        $editeur = $livre->getEditeur();
+        if (!$editeur) {
+            throw $this->createNotFoundException('Éditeur non trouvé pour ce livre');
+        }
+        return new Response("Nom de l'éditeur : " . $editeur->getNomEditeur());
     }
     #[Route('/new', name: 'app_livre_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -95,7 +97,7 @@ public function getEditeur(LivreRepository $livreRepository, int $isbn = 0): Res
     #[Route('/{id}', name: 'app_livre_delete', methods: ['POST'])]
     public function delete(Request $request, Livre $livre, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$livre->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $livre->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($livre);
             $entityManager->flush();
         }

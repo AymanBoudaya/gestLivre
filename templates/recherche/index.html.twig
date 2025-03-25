@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %} {% block title %}Recherche de Livres{% endblock
+%} {% block body %}
+<div class="container mt-4">
+  <h1 class="mb-4">🔍 Recherche de Livres</h1>
+
+  {# Formulaire de recherche #}
+  {{ form_start(form, {'attr': {'class': 'mb-5 bg-light p-4 rounded shadow-sm'
+  }}) }}
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4 input">
+      {{
+        form_row(form.titre, {
+          attr: { placeholder: "Entrez un titre..." }
+        })
+      }}
+    </div>
+    <div class="col-md-3">
+      {{
+        form_row(form.editeur, {
+          attr: { class: "form-select" }
+        })
+      }}
+    </div>
+    <div class="col-md-3">
+      {{
+        form_row(form.categorie, {
+          attr: { class: "form-select" }
+        })
+      }}
+    </div>
+  </div>
+  {{ form_end(form) }}
+
+  {# Résultats de recherche #} {% if form.vars.submitted %}
+  <div class="search-results mt-5">
+    <h2 class="mb-4">
+      {% if livres|length > 0 %}
+      <i class="fas fa-book"></i> {{ livres | length }} résultat(s) trouvé(s) {%
+      else %} <i class="fas fa-exclamation-triangle"></i> Aucun résultat {%
+      endif %}
+    </h2>
+
+    {% if livres|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Titre</th>
+            <th>ISBN</th>
+            <th>Pages</th>
+            <th>Prix</th>
+            <th>Éditeur</th>
+            <th>Catégorie</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for livre in livres %}
+          <tr>
+            <td>{{ livre.titre }}</td>
+            <td>{{ livre.isbn }}</td>
+            <td>{{ livre.nbPages }}</td>
+            <td>{{ livre.prix|format_currency('EUR') }}</td>
+            <td>{{ livre.editeur.nomEditeur ?? "-" }}</td>
+            <td>{{ livre.categorie.designation ?? "-" }}</td>
+            <td>
+              <a
+                href="{{ path('app_livre_show', { id: livre.id }) }}"
+                class="btn btn-sm btn-outline-primary"
+              >
+                <i class="fas fa-eye"></i> Voir
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+      Aucun livre ne correspond à vos critères de recherche.
+      <div class="mt-2">
+        Suggestions :
+        <ul>
+          <li>Vérifiez l'orthographe</li>
+          <li>Élargissez les filtres</li>
+          <li>Essayez des termes plus généraux</li>
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
